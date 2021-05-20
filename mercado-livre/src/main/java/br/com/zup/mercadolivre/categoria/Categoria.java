@@ -8,12 +8,15 @@ public class Categoria {
     private Long id;
     @Column(nullable = false)
     private String nome;
-    private Long idCategoriaMae;
+    @ManyToOne
+    private Categoria categoriaMae;
 
 
-    public Categoria(String nome, Long idCategoriaMae) {
+    private Categoria() {}
+    
+    public Categoria(String nome, Categoria categoriaMae) {
         this.nome = nome;
-        this.idCategoriaMae = idCategoriaMae;
+        this.categoriaMae = categoriaMae;
     }
 
     public Long getId() {
@@ -24,7 +27,7 @@ public class Categoria {
         return nome;
     }
 
-    public Long getIdCategoriaMae() {
-        return idCategoriaMae;
+    public Categoria getCategoriaMae() {
+        return categoriaMae;
     }
 }

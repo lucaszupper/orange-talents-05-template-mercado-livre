@@ -1,12 +1,15 @@
 package br.com.zup.mercadolivre.categoria;
 
-import br.com.zup.mercadolivre.validacao.ExistsId;
-import br.com.zup.mercadolivre.validacao.UniqueValue;
-
+import javax.persistence.EntityManager;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
+import br.com.zup.mercadolivre.validacao.ExistsId;
+import br.com.zup.mercadolivre.validacao.UniqueValue;
+
 public class CategoriaDto {
+	    
+
     @ExistsId(domainClass = Categoria.class, fieldName = "id")
     private Long idCategoriaMae;
     @NotNull @NotBlank @UniqueValue(domainClass = Categoria.class, fieldName = "nome")
@@ -15,8 +18,9 @@ public class CategoriaDto {
     private CategoriaDto(){}
 
     public CategoriaDto(Categoria categoria){
+
         this.nome = categoria.getNome();
-        this.idCategoriaMae = categoria.getIdCategoriaMae();
+        this.idCategoriaMae = categoria.getCategoriaMae().getId();
     }
 
     public CategoriaDto(Long idCategoriaMae, String nome) {
@@ -33,7 +37,16 @@ public class CategoriaDto {
     }
 
 
-    public Categoria toCategoria() {
-        return new Categoria(this.nome, this.idCategoriaMae);
+    public Categoria toCategoria(EntityManager manager) {
+        Categoria mae = manager.find(Categoria.class, this.idCategoriaMae);
+        return new Categoria(this.nome, mae);
+    }
+
+    @Override
+    public String toString() {
+        return "CategoriaDto{" +
+                "idCategoriaMae=" + idCategoriaMae +
+                ", nome='" + nome + '\'' +
+                '}';
     }
 }
