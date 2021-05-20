@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 
 @Entity
 public class Usuario {
-    @Id @GeneratedValue
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(nullable = false, unique = true)
     private String login;
