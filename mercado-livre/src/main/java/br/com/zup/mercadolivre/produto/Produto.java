@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -24,6 +25,8 @@ import org.hibernate.validator.constraints.Length;
 import com.sun.istack.NotNull;
 
 import br.com.zup.mercadolivre.categoria.Categoria;
+import br.com.zup.mercadolivre.opiniao.OpiniaoProduto;
+import br.com.zup.mercadolivre.pergunta.PerguntaProduto;
 import br.com.zup.mercadolivre.usuario.Usuario;
 import io.jsonwebtoken.lang.Assert;
 @Entity
@@ -47,6 +50,10 @@ public class Produto {
 	private Usuario usuario;
 	@OneToMany(mappedBy = "produto", cascade = CascadeType.MERGE)
 	private Set<ImagemProduto> imagens = new HashSet<ImagemProduto>();
+	@OneToMany(mappedBy = "produto")
+	private List<PerguntaProduto> perguntas;
+	@OneToMany(mappedBy = "produto")
+	private List<OpiniaoProduto> opinioes;
 
 	public Produto(@NotBlank String nome, @Positive BigDecimal valor, @Positive BigDecimal qtd,
 			@Length(max = 1000, min = 1) String descricao, @NotNull @Valid Categoria categoria, Collection<CaracteristicasDTO> caracteristicas, Usuario usuario) {
@@ -113,6 +120,19 @@ public class Produto {
 	public Set<ImagemProduto> getImagens() {
 		return imagens;
 	}
+
+	
+
+	public List<PerguntaProduto> getPerguntas() {
+		return perguntas;
+	}
+
+
+	public List<OpiniaoProduto> getOpinioes() {
+		return opinioes;
+	}
+
+
 
 	@Override
 	public boolean equals(Object obj) {

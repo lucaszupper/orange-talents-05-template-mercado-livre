@@ -51,7 +51,7 @@ public class PerguntaProduto {
 		this.produto = produto;
 	}
 	
-	
+	private PerguntaProduto(){}
 	
 	
 }
