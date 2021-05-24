@@ -1,4 +1,4 @@
-package br.com.zup.mercadolivre.opiniao;
+package br.com.zup.mercadolivre.pergunta;
 
 import java.net.URI;
 import java.util.Optional;
@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import br.com.zup.mercadolivre.produto.Produto;
@@ -20,30 +21,30 @@ import br.com.zup.mercadolivre.produto.ProdutoRepository;
 import br.com.zup.mercadolivre.usuario.Usuario;
 
 @RestController
-public class OpiniaoController {
-
+public class PerguntaController {
+	
 	@Autowired
 	private ProdutoRepository produtoRepository;
 	@Autowired
-	private OpiniaoProdutoRepository opiniaoRepository;
-	
-	
-	@PostMapping("/api/produto/{id}/opiniao")
+	private PerguntaProdutoRepository perguntaRepository;
+	@Autowired
+	private Emails emails;
+
+	@PostMapping("/api/produto/{id}/pergunta")
 	@Transactional
-	public ResponseEntity<OpiniaoDto> adicionaOpiniai(@PathVariable(name = "id") Long id, @Valid @RequestBody OpiniaoDto dto, @AuthenticationPrincipal Usuario usuario, UriComponentsBuilder builder) {
-		
+	public ResponseEntity<PerguntaDto> adicionaPergunta(@PathVariable(name = "id") Long id, @RequestBody @Valid PerguntaDto dto, @AuthenticationPrincipal Usuario usuario, UriComponentsBuilder builder) {
 		Optional<Produto> optional = produtoRepository.findById(id);
 		if(optional.isPresent()) {
 			Produto produto = optional.get();
-			OpiniaoProduto opiniaoProduto = this.opiniaoRepository.save(dto.toOpiniaoProduto(produto, usuario));
-			URI uri = builder.path("/api/produto/"+id+"/opiniao/{id}").buildAndExpand(opiniaoProduto.getId()).toUri();
+			PerguntaProduto pergunta = this.perguntaRepository.save(dto.toPergunta(usuario, produto));
+			URI uri = builder.path("/api/produto/"+id+"/pergunta/{id}").buildAndExpand(pergunta.getId()).toUri();
 			
-			return ResponseEntity.created(uri).body(new OpiniaoDto(opiniaoProduto));
+			emails.novaPergunta(pergunta);
+			
+			return ResponseEntity.created(uri).body(new PerguntaDto(pergunta));
 			
 		} else {
 			return ResponseEntity.notFound().build();
 		}
-		
-		
-}
+	}
 }
