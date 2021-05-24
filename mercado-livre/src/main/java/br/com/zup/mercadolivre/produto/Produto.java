@@ -1,6 +1,7 @@
 package br.com.zup.mercadolivre.produto;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -23,6 +24,7 @@ import org.hibernate.validator.constraints.Length;
 import com.sun.istack.NotNull;
 
 import br.com.zup.mercadolivre.categoria.Categoria;
+import br.com.zup.mercadolivre.usuario.Usuario;
 import io.jsonwebtoken.lang.Assert;
 @Entity
 public class Produto {
@@ -38,9 +40,16 @@ public class Produto {
 	private Categoria categoria;
 	@OneToMany(mappedBy = "produto", cascade = CascadeType.PERSIST)
 	private Set<CaracteristicasProduto> caracteristicas = new HashSet<>();
+	
+	private LocalDateTime dataCadastro = LocalDateTime.now();
+	@ManyToOne
+	@JoinColumn(name = "usuario_id")
+	private Usuario usuario;
+	@OneToMany(mappedBy = "produto", cascade = CascadeType.MERGE)
+	private Set<ImagemProduto> imagens = new HashSet<ImagemProduto>();
 
 	public Produto(@NotBlank String nome, @Positive BigDecimal valor, @Positive BigDecimal qtd,
-			@Length(max = 1000, min = 1) String descricao, @NotNull @Valid Categoria categoria, Collection<CaracteristicasDTO> caracteristicas) {
+			@Length(max = 1000, min = 1) String descricao, @NotNull @Valid Categoria categoria, Collection<CaracteristicasDTO> caracteristicas, Usuario usuario) {
 		this.nome = nome;
 		this.valor = valor;
 		this.qtd = qtd;
@@ -50,7 +59,7 @@ public class Produto {
 				.map(c -> c.toCaracteristicasProduto(this))
 				.collect(Collectors.toSet());
 		this.caracteristicas.addAll(caract);
-		
+		this.usuario = usuario;
 		Assert.isTrue(this.caracteristicas.size() >=3,"Produto precisa de 3 caracteristicas ou mais");
 	}
 
@@ -84,12 +93,25 @@ public class Produto {
 		return caracteristicas;
 	}
 
+	public LocalDateTime getDataCadastro() {
+		return dataCadastro;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((nome == null) ? 0 : nome.hashCode());
 		return result;
+	}
+
+	
+	public Usuario getUsuario() {
+		return usuario;
+	}
+
+	public Set<ImagemProduto> getImagens() {
+		return imagens;
 	}
 
 	@Override

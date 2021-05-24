@@ -1,21 +1,25 @@
 package br.com.zup.mercadolivre.produto;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 import javax.validation.constraints.Size;
 
 import org.hibernate.validator.constraints.Length;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import br.com.zup.mercadolivre.categoria.Categoria;
 import br.com.zup.mercadolivre.categoria.CategoriaRepository;
+import br.com.zup.mercadolivre.usuario.Usuario;
 import br.com.zup.mercadolivre.validacao.ExistsId;
 
 public class ProdutoDto {
@@ -33,9 +37,15 @@ public class ProdutoDto {
 	private String descricao;
 	@ExistsId(domainClass = Categoria.class, fieldName = "id")
 	private Long idCategoria;
+	@JsonFormat(pattern = "dd/MM/yyyy HH:mm")
+	private LocalDateTime dataCadastro;
 	
 	
 	
+	public LocalDateTime getDataCadastro() {
+		return dataCadastro;
+	}
+
 	public ProdutoDto(@NotBlank String nome, @Positive BigDecimal valor, @PositiveOrZero BigDecimal qtd,
 			@Size(min = 3) @Valid Set<CaracteristicasDTO> caracteristicas,
 			@Length(max = 1000, min = 1) String descricao, Long idCategoria) {
@@ -48,10 +58,10 @@ public class ProdutoDto {
 		this.idCategoria = idCategoria;
 	}
 
-	public Produto toProduto(CategoriaRepository repository) {
+	public Produto toProduto(CategoriaRepository repository, Usuario usuario) {
 		Categoria categoria = repository.findById(idCategoria).get();
 							
-		return new Produto(nome, valor, qtd, descricao, categoria, caracteristicas);
+		return new Produto(nome, valor, qtd, descricao, categoria, caracteristicas, usuario);
 	}
 	
 	@SuppressWarnings("unused")
@@ -65,6 +75,7 @@ public class ProdutoDto {
 		this.descricao = produto.getDescricao();
 		this.idCategoria = produto.getCategoria().getId();
 		produto.getCaracteristicas().forEach(c -> this.caracteristicas.add(new CaracteristicasDTO(c)));
+		this.dataCadastro = produto.getDataCadastro();
 	}
 
 	public String getNome() {
