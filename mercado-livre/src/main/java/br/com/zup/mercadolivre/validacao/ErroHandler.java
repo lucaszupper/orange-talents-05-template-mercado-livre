@@ -3,6 +3,7 @@ package br.com.zup.mercadolivre.validacao;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -31,6 +32,15 @@ public class ErroHandler {
 
             erros.add(erroNovo);
         }
+
+        return erros;
+    }
+
+    @ResponseStatus(code = HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(BindException.class)
+    public List<Erro> handlerBinder(BindException exception){
+        List<Erro> erros = new ArrayList<>();
+       erros.add(new Erro("Quantidade", exception.getMessage()));
 
         return erros;
     }

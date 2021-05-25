@@ -17,12 +17,13 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
 
-import org.hibernate.validator.constraints.Length;
-
 import com.sun.istack.NotNull;
+
+import org.hibernate.validator.constraints.Length;
 
 import br.com.zup.mercadolivre.categoria.Categoria;
 import br.com.zup.mercadolivre.opiniao.OpiniaoProduto;
@@ -36,7 +37,7 @@ public class Produto {
 
 	private @NotBlank String nome;
 	private @Positive BigDecimal valor;
-	private @Positive BigDecimal qtd;
+	private @Min(0) BigDecimal qtd;
 	private @Length(max = 1000, min = 1) String descricao;
 	@NotNull @Valid
 	@ManyToOne @JoinColumn(name = "categoria_id")
@@ -55,7 +56,7 @@ public class Produto {
 	@OneToMany(mappedBy = "produto")
 	private List<OpiniaoProduto> opinioes;
 
-	public Produto(@NotBlank String nome, @Positive BigDecimal valor, @Positive BigDecimal qtd,
+	public Produto(@NotBlank String nome, @Positive BigDecimal valor, @Min(0) BigDecimal qtd,
 			@Length(max = 1000, min = 1) String descricao, @NotNull @Valid Categoria categoria, Collection<CaracteristicasDTO> caracteristicas, Usuario usuario) {
 		this.nome = nome;
 		this.valor = valor;
@@ -151,7 +152,15 @@ public class Produto {
 		return true;
 	}
 	
-	
+	public boolean diminuiQtd(@Min(0) Integer qtd){
+		if(this.qtd.compareTo(new BigDecimal(qtd)) >= 0){
+			this.qtd = this.qtd.subtract(new BigDecimal(qtd));
+			return true;
+		} else {
+			return false;
+		}
+		
+	}
 
 
 }
