@@ -1,5 +1,8 @@
 package br.com.zup.mercadolivre.novaCompra;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -8,13 +11,15 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 
+import br.com.zup.mercadolivre.novaCompra.retornoCompra.Pagamento;
+import br.com.zup.mercadolivre.novaCompra.retornoCompra.StatusPagamento;
 import br.com.zup.mercadolivre.produto.Produto;
 import br.com.zup.mercadolivre.usuario.Usuario;
-import ch.qos.logback.core.status.Status;
 @Entity
 public class Compra {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,7 +34,11 @@ public class Compra {
     private Usuario user;
     @Enumerated(EnumType.STRING) @NotNull
     private Gateway gateway;
+    @Enumerated(EnumType.STRING)
     private StatusCompra statusCompra;
+
+    @OneToMany(mappedBy = "compra")
+    private List<Pagamento> pagamentos = new ArrayList<Pagamento>();
 
 
     public Compra(Produto produto, Integer qtd, Usuario user, Gateway gateway) {
@@ -76,6 +85,27 @@ public class Compra {
     public StatusCompra getStatusCompra() {
         return this.statusCompra;
     }
-    
 
+
+
+    public List<Pagamento> getPagamentos() {
+        return this.pagamentos;
+    }
+
+    public boolean atualizaStatus(Pagamento pagamento){
+       if(!this.statusCompra.equals(StatusCompra.FINALIZADA)) {
+        
+           if(pagamento.getStatusPagamento().equals(StatusPagamento.SUCESSO)) {
+               this.statusCompra = StatusCompra.FINALIZADA;
+               return true;
+           } else {
+               this.statusCompra = StatusCompra.FALHA;
+               return false;
+           }
+
+        
+        
+       }
+        return true;
+    }
 }

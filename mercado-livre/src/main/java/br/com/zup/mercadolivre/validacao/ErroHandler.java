@@ -40,7 +40,7 @@ public class ErroHandler {
     @ExceptionHandler(BindException.class)
     public List<Erro> handlerBinder(BindException exception){
         List<Erro> erros = new ArrayList<>();
-       erros.add(new Erro("Quantidade", exception.getMessage()));
+       erros.add(new Erro("Erro", exception.getMessage()));
 
         return erros;
     }

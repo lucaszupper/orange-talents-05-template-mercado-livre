@@ -22,4 +22,13 @@ public class Emails {
         mailer.send("<html>...</html>","Nova Compra..." ,compra.getUser().getLogin(), "comprass@zup.com.br" ,compra.getProduto().getUsuario().getLogin());
     }
 
+    public void pagamentoRealizado(Compra compra) {
+        mailer.send("<html>...</html>","Pagamento Aprovado..." ,compra.getUser().getLogin(), "comprass@zup.com.br" ,compra.getProduto().getUsuario().getLogin());
+    }
+
+    
+    public void pagamentoNaoRealizado(Compra compra) {
+        mailer.send("<html>...</html>","Pagmento Nao foi Aprovado..." ,compra.getProduto().getUsuario().getLogin(), "comprass@zup.com.br" ,compra.getUser().getLogin());
+    }
+
 }
